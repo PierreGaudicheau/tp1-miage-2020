@@ -1,6 +1,5 @@
 package com.acme.todolist.adapters.rest_api;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
