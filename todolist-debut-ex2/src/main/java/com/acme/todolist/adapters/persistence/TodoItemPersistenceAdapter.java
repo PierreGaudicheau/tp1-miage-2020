@@ -20,7 +20,6 @@ import com.acme.todolist.domain.TodoItem;
 public class TodoItemPersistenceAdapter implements LoadTodoItem {
 
 	private TodoItemRepository todoItemRepository;
-
 	private TodoItemMapper mapper;
 
 	@Inject
@@ -32,8 +31,7 @@ public class TodoItemPersistenceAdapter implements LoadTodoItem {
 
 	@Override
 	public List<TodoItem> loadAllTodoItems() {
-		return this.todoItemRepository.findAll().stream()
-				.map(todoItemJpaEntory -> mapper.mapToTodoItem(todoItemJpaEntory)).collect(Collectors.toList());
+		return this.todoItemRepository.findAll().stream().map(todoItemJpaEntory -> mapper.mapToTodoItem(todoItemJpaEntory)).collect(Collectors.toList());
 	}
 
 }

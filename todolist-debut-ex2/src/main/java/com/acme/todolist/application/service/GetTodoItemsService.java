@@ -12,19 +12,16 @@ import com.acme.todolist.domain.TodoItem;
 
 @Component
 public class GetTodoItemsService implements GetTodoItems {
-
-		
+	
 	private LoadTodoItem loadTodoItem;
 	
 	@Inject
 	public GetTodoItemsService(LoadTodoItem loadTodoItem) {
-		this.loadTodoItem = loadTodoItem;
-		
+		this.loadTodoItem = loadTodoItem;	
 	}
 
 	@Override
 	public List<TodoItem> getAllTodoItems() {
 		return this.loadTodoItem.loadAllTodoItems();
 	}
-
 }

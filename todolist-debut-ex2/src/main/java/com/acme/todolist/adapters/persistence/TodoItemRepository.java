@@ -10,11 +10,8 @@ import org.springframework.data.repository.CrudRepository;;
  * @author bflorat
  *
  */
-public interface TodoItemRepository extends CrudRepository<TodoItemJpaEntity,String> {
-			
+public interface TodoItemRepository extends CrudRepository<TodoItemJpaEntity,String> {	
+	
 	List<TodoItemJpaEntity> findAll(); 
-	
 	Optional<TodoItemJpaEntity> findById(String id);
-	
-	
 }

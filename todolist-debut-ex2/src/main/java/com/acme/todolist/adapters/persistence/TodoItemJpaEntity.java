@@ -18,14 +18,10 @@ public class TodoItemJpaEntity {
 
 	@Id
 	private String id;
-
 	private Instant time;
-
 	private String content;
-
 	/** Flag permettant d'ignorer certains items en modifiant la base de donnée*/
 	private Boolean visible;
-
 	/** Constructeur vide imposé par JPA */
 	public TodoItemJpaEntity() {
 	}
