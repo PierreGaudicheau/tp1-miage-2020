@@ -5,9 +5,7 @@ NOTE: TP de deux slots de 1h20
 ## Nom des étudiants de ce binôme 
 WARNING: NE PAS OUBLIER DE MENTIONNER LES DEUX NOMS !
 
-#XXX# et #YYY#
-
-Commentaires éventuels des étudiants : #XXXXXX#
+Sarah Arkam et Pierre Gaudicheau
 
 ## Pré-requis 
 
@@ -49,7 +47,18 @@ _Temps estimé : 1 h_
 
 *Le code est-il structuré en couches ? Imaginez un projet d'entreprise constitué de centaines de classes ainsi structuré : que risque-t-il d'arriver ?*
 
+Non le code n'est pas structué en couche, toutes les classes sont situées dans un même répertoire.
+Pour un projet de cette taille cela n'est pas un réel problème, cependant pour un projet d'entreprise constitué de centaines de classes cela serait très difficile et très confus de s'y retrouver dans le code. 
+
 *Où se trouve le code métier (voir la règle de gestion RG1) ? Cette règle est-elle facilement testable par un test unitaire ?*
+
+Le code métier se trouve dans la classe TodoListController.java. Deux méthodes le composent :
+- public List<TodoItem> todoItems()
+- private String finalContent(TodoItem item)
+
+La règle de gestion RG1 dit "Si l'item a plus de 24h, ajouter dans le contenu une note "[LATE!]". Donc, chaque TodoItem de la liste du repository doit vérifier cette règle.
+
+Cette dernière n'est pas facilement testable par un test unitaire car il faudrait simuler un repository de test pour faire le test unitaire. Ceci est possible avec mockito.
 
 * Lancer une base PostgreSQL en Docker :
 ```bash
@@ -57,14 +66,72 @@ docker run --rm -it -e POSTGRES_PASSWORD=password -p 5432:5432 postgres
 ```
 *Expliquer cette ligne de commande (y compris les options utilisées)*
 
+Cette ligne de commande lance un conteneur possédant une BDD sur le port 5432. Nous allons voir maintenant les options utilisées :
+	 * - docker run : démarre le conteneur;
+	 * --rm : supprime automatiquement le conteneur à la fin de l'exécution;
+	 * -i : affichage des logs.
+	 * -t : Pour avoir un terminal et exécuter des commandes dans le conteneur;
+	 * -e POSTGRES_PASSWORD=password : initialisation de la variable d'environnement POSTGRES_PASSWORD;
+	 * -p 5432:5432 : port 5432 du conteneur vers le port 5432 de la machine;
+	 * postgres : image du conteneur à démarrer.
+
 * Compléter le code manquant dans la méthode `TodoListController.createTodoItem()`
 
+On sauvegarde l'item dans le repository.
+	@PostMapping("/todos")
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public void createTodoItem(@RequestBody TodoItem todoItem) {
+		this.todoItemRepository.save(todoItem);
+	}
+
+
 *Pourquoi `todoItemRepository` est-il `null` ? Quelle est la meilleure façon de l'injecter ?*
+
+todoItemRepository est "null" car il n'est pas injecté. 
+Pour l'injecter de la meilleur manière il faut rajouté  l'annotation @Inject au dessus du constructeur.
 
 * Modifier le code en conséquence.
 
 * Tester vos endpoints avec un client REST.
 
+Nous avons utilisé le client REST Insomnia pour tester nos endpoints. Nous avons créer deux requêtes, "GET localhost:8080/todos" et "POST localhost:8080/todos". 
+"/todos" est le PostMapping pour createTodoItem.
+
+Dans le body (en JSON) de POST nous avons inséré deux requêtes une par une :
+```json
+{
+    "id": "1",
+    "content": "PouetPouet_EnAvance",
+    "time": 1584808146
+}
+```
+et
+```json
+{
+	"id": "2",
+  	"content": "PouetPouet_EnRetard",
+  	"time": "1553185746"  
+}
+```
+La première est en 2021 et la deuxième en 2019.
+Après les avoir envoyé, Nous avons comme réponse "201" qui veut dire que c'est un succès.
+
+Dans Get, après l'envoie, nous avons dans le preview :
+```json
+[
+  {
+    "id": "2",
+    "time": "2019-03-21T16:29:06Z",
+    "content": "[LATE!]PouetPouet_EnRetard"
+  },
+  {
+    "id": "1",
+    "time": "2020-03-21T16:29:06Z",
+    "content": "PouetPouet_EnAvance"
+  }
+]
+```
+Nous avons comme réponse "200" qui veut dire que c'est un succès. Comme nous pouvons le voir, la règle RG1 est respecté.
 
 [NOTE]
 ====
@@ -99,12 +166,26 @@ Source : http://leanpub.com/get-your-hands-dirty-on-clean-architecture[Tom Hombe
 
 *Rappeler en quelques lignes les grands principes de cette architecture.*
 
+Le code à notre disposition utilise une architecture hexagonale. Celle-ci s’appuie sur trois grands principes : 
+* Tout d’abord, le premier principe, cette architecture sépare explicitement le code en trois grandes zones formalisées : Application, Domain et Infrastructure.  Dans la zone Application se trouve l’utilisateur ou les programmes extérieurs qui vont interagir avec l’application. Ce sont les acteurs qui pilotent le Domain. Dans cette dernière, se trouve le code qui concerne et implémente la logique métier. Et pour finir, la zone Infrastructure, regroupe tout ce que l’application a besoin comme par exemple le code qui interagit avec une base de données.
+* Ensuite, le deuxième principe, les dépendances vont vers le domaine. C’est-à-dire que le Domain ne dépend pas du côté application et il ne dépend pas non plus du côté Infrastructure. Cela permet de pouvoir tester le programme indépendamment de ses systèmes extérieurs.
+* Enfin, le troisième principe, on isole les frontières par des interfaces. Le code applicatif pilote le code métier à travers une interface définie dans le code métier.
+
+source : https://blog.octo.com/architecture-hexagonale-trois-principes-et-un-exemple-dimplementation/
+
 Complétez ce code avec une fonctionnalité de création de `TodoItem`  persisté en base et appelé depuis un endpoint REST `POST /todos` qui :
 
 * prend un `TodoItem` au format JSON dans le body (voir exemple de contenu plus haut)
 * renvoie un code `201` en cas de succès. 
 
 La fonctionnalité à implémenter est contractualisée par le port d'entrée `AddTodoItem`.
+
+Pour implémenter la fonctionnalité nous avons créé 3 classes : 
+* AddTodoItem dans le port in de application
+* PostTodoItemsService dans application service
+* TodoItemPersistenceSaveAdapter dans adapters persistence
+
+Nous avons bien reçu le code "201" après l'envoie de notre TodoItem au format JSON dans le body.
 
 # Exercice 3 - Ecriture de tests
 _Temps estimé : 20 mins_
