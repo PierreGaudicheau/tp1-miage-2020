@@ -1,6 +1,7 @@
 package com.acme.todolist.domain;
 
 import java.time.Instant;
+
 import java.time.temporal.ChronoUnit;
 
 /**
@@ -60,7 +61,7 @@ public class TodoItem {
 	 * 
 	 * @return liste des items
 	 */
-	String finalContent() {
+	public String finalContent() {
 		return isLate()? LATE+getContent() :  getContent();
 	}
 
