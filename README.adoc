@@ -196,12 +196,12 @@ _Temps estimé : 20 mins_
 
 *Quels types de tests devra-t-on écrire pour les adapteurs ?* 
 
-Pour les adaptateurs il faudra écrire des tests unitaires ou test de composants.
+Pour les adaptateurs il faudra écrire des tests d'intégrations
 
 
 *Que teste-on dans ce cas ?*
 
-On test si les classes fonctionnent individuellement (indépendamment des autres).
+On test si les classes fonctionnent bien ensemble
 
 
 *S'il vous reste du temps, écrivez quelques uns de ces types de test.*
